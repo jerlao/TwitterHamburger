@@ -16,6 +16,9 @@ class User: NSObject {
     var username:String?
     var profileImgUrl:String?
     var tagline:String?
+    var numTweets:String?
+    var numFollowers:String?
+    var numFollowing:String?
     var dictionary:NSDictionary
     
     init(dictionary: NSDictionary) {
@@ -24,6 +27,9 @@ class User: NSObject {
         username = dictionary["screen_name"] as? String
         profileImgUrl = dictionary["profile_image_url"] as? String
         tagline = dictionary["description"] as? String
+        numTweets = "\((dictionary["statuses_count"])!)"
+        numFollowers = "\((dictionary["followers_count"])!)"
+        numFollowing = "\((dictionary["friends_count"])!)"
     }
     
     func logout(completion: () -> ()) {

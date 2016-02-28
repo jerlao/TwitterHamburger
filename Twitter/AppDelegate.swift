@@ -13,18 +13,18 @@ import BDBOAuth1Manager
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
-    let storyboard = UIStoryboard(name: "Main", bundle: nil)
-
 
     func application(application: UIApplication, didFinishLaunchingWithOptions launchOptions: [NSObject: AnyObject]?) -> Bool {
         // Override point for customization after application launch.
         if User.currentUser != nil {
             // Access the storyboard and fetch an instance of the view controller
-            let rootVC = storyboard.instantiateViewControllerWithIdentifier("NavigationController") as! UINavigationController
-            self.window?.rootViewController = rootVC
-            self.window?.makeKeyAndVisible()
-
-           
+            let storyboard = UIStoryboard(name: "Main", bundle: nil)
+            let hamburgerViewController = storyboard.instantiateViewControllerWithIdentifier("HamburgerViewController") as! HamburgerViewController
+            window?.rootViewController = hamburgerViewController
+            let menuViewController = storyboard.instantiateViewControllerWithIdentifier("MenuViewController") as! MenuViewController
+            hamburgerViewController.menuViewController = menuViewController
+            hamburgerViewController.contentViewController = menuViewController.timelineViewController as! UINavigationController
+            menuViewController.hamburgerViewController = hamburgerViewController
         }
         return true
     }

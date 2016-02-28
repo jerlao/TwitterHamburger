@@ -30,12 +30,25 @@ class ViewController: UIViewController {
             if error == nil {
                 if let getUser = user {
                     self.user = getUser
-                    self.performSegueWithIdentifier("MainToTimelineSegue", sender: self)
+                    self.performSegueWithIdentifier("HamburgerSegue", sender: self)
                 }
             } else {
                 print(error?.localizedDescription)
             }
         }
+    }
+    
+    @IBAction func unwindToLogin(segue: UIStoryboardSegue) {
+        //nothing goes here
+    }
+    
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        let hamburgerViewController = segue.destinationViewController as! HamburgerViewController
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let menuViewController = storyboard.instantiateViewControllerWithIdentifier("MenuViewController") as! MenuViewController
+        hamburgerViewController.menuViewController = menuViewController
+        hamburgerViewController.contentViewController = menuViewController.timelineViewController as! UINavigationController
+        menuViewController.hamburgerViewController = hamburgerViewController
     }
 
 }

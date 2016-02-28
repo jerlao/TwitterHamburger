@@ -62,6 +62,15 @@ class TwitterClient: BDBOAuth1SessionManager {
         })
     }
     
+    func mentionsTimelineWithParams(params: NSDictionary?, completion: (tweets: [Tweet]?, error: NSError?) -> ()) {
+        GET("1.1/statuses/mentions_timeline.json", parameters: params, success: { (sessionTask: NSURLSessionDataTask, response: AnyObject?) -> Void in
+            let tweetArray = Tweet.tweetsWithArray(response as! [NSDictionary])
+            completion(tweets: tweetArray, error: nil)
+            }, failure: { (sessionTask: NSURLSessionDataTask?, error: NSError) -> Void in
+                completion(tweets: nil, error: error)
+        })
+    }
+    
     func loginWithCompletion(completion: (user: User?, error: NSError?) -> ()) {
         loginCompletion = completion
         TwitterClient.sharedInstance.requestSerializer.removeAccessToken()

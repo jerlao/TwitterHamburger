@@ -9,20 +9,27 @@
 import UIKit
 import AFNetworking
 
+@objc protocol TimelineViewControllerDelegate {
+    optional func timelineViewController(timelineViewController: TimelineViewController, didOpenHamburger isOpen: Bool)
+}
+
 class TimelineViewController: UIViewController, UITableViewDataSource, TweetViewControllerDelegate {
     
     var tweets = [Tweet]()
     var user:User?
     @IBOutlet var tableView: UITableView!
+    weak var delegate:TimelineViewControllerDelegate?
+    var isOpen = false
+    @IBOutlet weak var hamburgerButtonOutlet: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        navigationController?.navigationBar.barStyle = UIBarStyle.Black
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: "refreshControlAction:", forControlEvents: UIControlEvents.ValueChanged)
         tableView.insertSubview(refreshControl, atIndex: 0)
         tableView.estimatedRowHeight = 100
         tableView.rowHeight = UITableViewAutomaticDimension
+        navigationController?.navigationBar.barStyle = UIBarStyle.Black
         navigationController?.navigationBar.barTintColor = UIColor(red: 85/255, green: 172/255, blue: 238/255, alpha: 1)
         navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
@@ -56,13 +63,6 @@ class TimelineViewController: UIViewController, UITableViewDataSource, TweetView
         cell.tweetTimeLabel.text = tweet.createdTime
         cell.selectionStyle = UITableViewCellSelectionStyle.None
         return cell
-    }
-    
-    @IBAction func onLogoutTapped(sender: UIBarButtonItem) {
-        User.currentUser?.logout({ () -> () in
-            // self.dismissViewControllerAnimated(true, completion: nil)
-            self.dismissViewControllerAnimated(true, completion: nil)
-        })
     }
     
     func refreshControlAction(refreshControl: UIRefreshControl) {
@@ -114,5 +114,13 @@ class TimelineViewController: UIViewController, UITableViewDataSource, TweetView
         }
     }
 
+    @IBAction func onHamburgerTapped(sender: UIBarButtonItem) {
+        delegate?.timelineViewController!(self, didOpenHamburger: isOpen)
+        isOpen = !isOpen
+    }
+    
+    override func preferredStatusBarStyle() -> UIStatusBarStyle {
+        return UIStatusBarStyle.LightContent
+    }
 
 }
