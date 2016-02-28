@@ -12,7 +12,7 @@ import AFNetworking
 class MenuViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
 
     @IBOutlet weak var tableView: UITableView!
-    private let menuArray = ["Timeline", "Mentions", "Profile"]
+    private let menuArray = ["Timeline", "Timeline", "Mentions"]
     var hamburgerViewController: HamburgerViewController!
     var timelineViewController: UIViewController!
     var mentionsViewController: UIViewController!
@@ -28,9 +28,9 @@ class MenuViewController: UIViewController, UITableViewDataSource, UITableViewDe
         mentionsViewController = storyboard.instantiateViewControllerWithIdentifier("MentionsNavigationController")
         profileViewController = storyboard.instantiateViewControllerWithIdentifier("ProfileNavigationController")
         
+        viewControllers.append(profileViewController)
         viewControllers.append(timelineViewController)
         viewControllers.append(mentionsViewController)
-        viewControllers.append(profileViewController)
         tableView.rowHeight = 60
     }
 
@@ -60,11 +60,15 @@ class MenuViewController: UIViewController, UITableViewDataSource, UITableViewDe
     
     func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCellWithIdentifier("MenuCell", forIndexPath: indexPath) as! MenuCell
-        cell.viewLabel.text = menuArray[indexPath.row]
+        if indexPath.row == 0 {
+            cell.viewLabel.text = User.currentUser!.name
+        } else {
+            cell.viewLabel.text = menuArray[indexPath.row]
+        }
         switch indexPath.row {
-        case 0: cell.iconImageView.image = UIImage(named: "feed")
-        case 1: cell.iconImageView.image = UIImage(named: "timeline")
-        case 2: cell.iconImageView.image = UIImage(named: "profile")
+        case 0: cell.iconImageView.setImageWithURL(NSURL(string: User.currentUser!.profileImgUrl!)!)
+        case 1: cell.iconImageView.image = UIImage(named: "feed")
+        case 2: cell.iconImageView.image = UIImage(named: "timeline")
         default: cell.iconImageView.image = UIImage(named: "feed")
         }
         cell.selectionStyle = UITableViewCellSelectionStyle.None
@@ -74,15 +78,15 @@ class MenuViewController: UIViewController, UITableViewDataSource, UITableViewDe
     func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let contentVC = viewControllers[indexPath.row] as! UINavigationController
         hamburgerViewController.contentViewController = contentVC
-        if contentVC.topViewController is TimelineViewController {
+        if contentVC.topViewController is ProfileViewController {
+            let profileVC = contentVC.topViewController as! ProfileViewController
+            profileVC.isOpen = false
+        } else if contentVC.topViewController is TimelineViewController {
             let timelineVC = contentVC.topViewController as! TimelineViewController
             timelineVC.isOpen = false
         } else if contentVC.topViewController is MentionsViewController {
             let mentionsVC = contentVC.topViewController as! MentionsViewController
             mentionsVC.isOpen = false
-        } else {
-            let profileVC = contentVC.topViewController as! ProfileViewController
-            profileVC.isOpen = false
         }
     }
     
