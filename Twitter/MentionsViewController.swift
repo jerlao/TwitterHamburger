@@ -17,10 +17,10 @@ class MentionsViewController: UIViewController, UITableViewDataSource {
     var isOpen = false
     weak var delegate:MentionsViewControllerDelegate?
     @IBOutlet weak var tableView: UITableView!
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Do any additional setup after loading the view.
         let refreshControl = UIRefreshControl()
         refreshControl.addTarget(self, action: "refreshControlAction:", forControlEvents: UIControlEvents.ValueChanged)
@@ -46,6 +46,9 @@ class MentionsViewController: UIViewController, UITableViewDataSource {
         let tweet = tweets[indexPath.row]
         let user = tweet.user
         let profileImageUrl = NSURL(string: (user?.profileImgUrl)!)
+        let tapGesture = UITapGestureRecognizer(target: self, action: "onImageTapped:")
+        cell.profileImageView.addGestureRecognizer(tapGesture)
+        cell.profileImageView.userInteractionEnabled = true
         cell.tweet = tweet
         cell.tweetLabel.text = tweet.text
         cell.usernameLabel.text = user?.name
@@ -83,15 +86,29 @@ class MentionsViewController: UIViewController, UITableViewDataSource {
             completion(tweetsArray: tweets!)
         }
     }
-
+    
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
-        let destination = segue.destinationViewController as! TweetViewController
-        let button = sender as! UIButton
-        let btnPosition = button.convertPoint(CGPointZero, toView: tableView)
-        let indexPath = tableView.indexPathForRowAtPoint(btnPosition)
-        let tweet = tweets[indexPath!.row]
-        destination.title = "Reply to @\(tweet.user!.username!)"
-        destination.tweet = tweet
+        if segue.identifier == "mentionsToProfile" {
+            let destination = segue.destinationViewController as! UserViewController
+            let indexPath = sender as! NSIndexPath
+            destination.user = tweets[indexPath.row].user
+        } else {
+            let destination = segue.destinationViewController as! TweetViewController
+            let button = sender as! UIButton
+            let btnPosition = button.convertPoint(CGPointZero, toView: tableView)
+            let indexPath = tableView.indexPathForRowAtPoint(btnPosition)
+            let tweet = tweets[indexPath!.row]
+            destination.title = "Reply to @\(tweet.user!.username!)"
+            destination.tweet = tweet
+        }
     }
-
+    
+    func onImageTapped(sender: UITapGestureRecognizer) {
+        let point = sender.view
+        let mainCell = point?.superview
+        let main = mainCell?.superview
+        let cell = main as! MentionTableViewCell
+        let indexPath = tableView.indexPathForCell(cell)
+        performSegueWithIdentifier("mentionsToProfile", sender: indexPath)
+    }
 }

@@ -9,22 +9,15 @@
 import UIKit
 import AFNetworking
 
-@objc protocol ProfileViewControllerDelegate {
-    optional func profileViewController(profileViewController: ProfileViewController, didOpenHamburger isOpen: Bool)
-}
+class UserViewController: UIViewController {
 
-class ProfileViewController: UIViewController {
-
-    @IBOutlet weak var hamburgerButtonOutlet: UIBarButtonItem!
     @IBOutlet weak var backgroundImageView: UIImageView!
     @IBOutlet weak var profileImageView: UIImageView!
     @IBOutlet weak var userNameLabel: UILabel!
     @IBOutlet weak var tweetsLabel: UILabel!
     @IBOutlet weak var followingLabel: UILabel!
     @IBOutlet weak var followersLabel: UILabel!
-    @IBOutlet weak var signoutButtonOutlet: UIButton!
-    var isOpen = false
-    weak var delegate:ProfileViewControllerDelegate?
+    var user:User?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,35 +28,21 @@ class ProfileViewController: UIViewController {
         navigationController?.navigationBar.tintColor = UIColor.whiteColor()
         navigationController?.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.whiteColor()]
         backgroundImageView.image = UIImage(named: "bgImage")
-        let imageUrl = NSURL(string: (User.currentUser?.profileImgUrl)!)
+        let imageUrl = NSURL(string: (user!.profileImgUrl)!)
         profileImageView.setImageWithURL(imageUrl!)
         profileImageView.layer.cornerRadius = 10
         profileImageView.layer.borderWidth = 5
         profileImageView.layer.borderColor = UIColor.whiteColor().CGColor
         profileImageView.clipsToBounds = true
-        userNameLabel.text = User.currentUser!.name
-        tweetsLabel.text = User.currentUser!.numTweets ?? "0"
-        followingLabel.text = User.currentUser!.numFollowing ?? "0"
-        followersLabel.text = User.currentUser!.numFollowers ?? "0"
-        signoutButtonOutlet.layer.cornerRadius = 10
+        userNameLabel.text = user!.name
+        tweetsLabel.text = user!.numTweets ?? "0"
+        followingLabel.text = user!.numFollowing ?? "0"
+        followersLabel.text = user!.numFollowers ?? "0"
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
-    }
-    
-    @IBAction func onHamburgerTapped(sender: AnyObject) {
-        delegate?.profileViewController!(self, didOpenHamburger: isOpen)
-        isOpen = !isOpen
-    }
-
-    @IBAction func onSignout(sender: UIButton) {
-        User.currentUser?.logout({ () -> () in
-            // self.dismissViewControllerAnimated(true, completion: nil)
-            // self.dismissViewControllerAnimated(true, completion: nil)
-            self.performSegueWithIdentifier("UnwindToLogin", sender: self)
-        })
     }
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle {

@@ -54,6 +54,8 @@ class TimelineViewController: UIViewController, UITableViewDataSource, TweetView
         let tweet = tweets[indexPath.row]
         let user = tweet.user
         let profileImageUrl = NSURL(string: (user?.profileImgUrl)!)
+        let tapGesture = UITapGestureRecognizer(target: self, action: "onImageTapped:")
+        cell.profileImageView.addGestureRecognizer(tapGesture)
         cell.tweet = tweet
         cell.tweetLabel.text = tweet.text
         cell.usernameLabel.text = user?.name
@@ -98,6 +100,10 @@ class TimelineViewController: UIViewController, UITableViewDataSource, TweetView
             let destination = segue.destinationViewController as! DetailViewController
             destination.title = "Tweet"
             destination.tweet = tweet
+        } else if segue.identifier == "timelineToProfile" {
+            let destination = segue.destinationViewController as! UserViewController
+            let indexPath = sender as! NSIndexPath
+            destination.user = tweets[indexPath.row].user
         } else {
             let destination = segue.destinationViewController as! TweetViewController
             if segue.identifier == "NewTweetSegue" {
@@ -123,4 +129,12 @@ class TimelineViewController: UIViewController, UITableViewDataSource, TweetView
         return UIStatusBarStyle.LightContent
     }
 
+    func onImageTapped(sender: UITapGestureRecognizer) {
+        let point = sender.view
+        let mainCell = point?.superview
+        let main = mainCell?.superview
+        let cell = main as!TwitterTableViewCell
+        let indexPath = tableView.indexPathForCell(cell)
+        performSegueWithIdentifier("timelineToProfile", sender: indexPath)
+    }
 }
